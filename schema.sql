@@ -1,20 +1,10 @@
 DROP TABLE IF EXISTS answers_photos;
 DROP TABLE IF EXISTS answers;
 DROP TABLE IF EXISTS questions;
-DROP TABLE IF EXISTS products;
-
-CREATE TABLE products(
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  slogan text,
-  description text,
-  category VARCHAR(100),
-  default_price VARCHAR(100)
-);
 
 CREATE TABLE questions(
   id SERIAL PRIMARY KEY,
-  product_id INT references products(id),
+  product_id INT,
   body text,
   date_written BIGINT,
   asker_name VARCHAR(100),
@@ -40,9 +30,6 @@ CREATE TABLE answers_photos(
   url VARCHAR(200)
 );
 
-COPY products
-FROM '/Users/derekwing/hr/sdc/QandAAPI/products.csv'
-DELIMITER ',' CSV HEADER;
 COPY questions
 FROM '/Users/derekwing/hr/sdc/QandAAPI/questions.csv'
 DELIMITER ',' CSV HEADER;
