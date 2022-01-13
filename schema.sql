@@ -30,12 +30,6 @@ CREATE TABLE answers_photos(
   url VARCHAR(200)
 );
 
-COPY questions
-FROM '/Users/derekwing/hr/sdc/QandAAPI/questions.csv'
-DELIMITER ',' CSV HEADER;
-COPY answers
-FROM '/Users/derekwing/hr/sdc/QandAAPI/answers.csv'
-DELIMITER ',' CSV HEADER;
-COPY answers_photos
-FROM '/Users/derekwing/hr/sdc/QandAAPI/answers_photos.csv'
-DELIMITER ',' CSV HEADER;
+\COPY questions FROM '/Users/derekwing/hr/sdc/QandAAPI/questions.csv' DELIMITER ',' CSV HEADER;
+\COPY answers FROM '/Users/derekwing/hr/sdc/QandAAPI/answers.csv' DELIMITER ',' CSV HEADER;
+\COPY answers_photos FROM '/Users/derekwing/hr/sdc/QandAAPI/answers_photos.csv' DELIMITER ',' CSV HEADER;
