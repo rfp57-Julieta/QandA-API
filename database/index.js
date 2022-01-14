@@ -25,7 +25,6 @@ async function getQuestions(product_id) {
   const query = `SELECT id, body, date_written, asker_name, reported, helpful FROM questions WHERE product_id=${product_id} LIMIT 3`;
   let questions_data = await pool.query(query);
   package['results'] = questions_data.rows;
-  console.log('questions_data.rows:', questions_data.rows);
   for (let question of questions_data.rows) {
     const question_id = question.id;
     const query = `SELECT * FROM answers WHERE question_id=${question_id} LIMIT 3`;
@@ -44,7 +43,6 @@ async function getQuestions(product_id) {
         photos: photos_data.rows,
       };
       question['answers'] = answers;
-      // console.log('photos_data.rows:', photos_data.rows);
     }
   }
   return package;
