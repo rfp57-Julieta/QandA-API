@@ -112,10 +112,24 @@ async function postAnswer(body, name, email, question_id, photos, cb) {
   }
 }
 
+async function markQuestion(type, question_id, cb) {
+  try {
+    console.log('type:', type);
+    console.log('question_id:', question_id);
+    if (type === 'helpful') {
+      const query = `UPDATE questions SET helpful=helpful+1 WHERE id=${question_id}`;
+      await pool.query(query);
+    }
+  } catch (err) {
+    cb(err);
+  }
+}
+
 module.exports = {
   pool,
   getQuestions,
   getAnswers,
   postQuestion,
   postAnswer,
+  markQuestion,
 };

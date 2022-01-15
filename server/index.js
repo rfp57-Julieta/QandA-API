@@ -5,6 +5,7 @@ const {
   getAnswers,
   postQuestion,
   postAnswer,
+  markQuestion,
 } = require('../database/index.js');
 
 const app = express();
@@ -86,4 +87,9 @@ app.post('/qa/questions/:question_id/answers', async (req, res) => {
     }
   );
   res.status(201).send('Successfully posted question to server..');
+});
+
+app.put('/questions/:question_id/helpful', (req, res) => {
+  markQuestion('helpful', req.query.question_id);
+  res.status(204).send('put request..');
 });
