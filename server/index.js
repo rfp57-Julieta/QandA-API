@@ -32,6 +32,7 @@ app.get('/qa/questions', async (req, res) => {
 
 app.get('/qa/questions/:question_id/answers', async (req, res) => {
   // req.params and req.query depends on what the client(FEC) sends us
+  // req.query comes from postman/thunderclient
   // console.log('req.params:', req.params);
   // console.log('req.query:', req.query);
   let answers = await getAnswers(req.query.question_id, (err) => {
@@ -90,22 +91,22 @@ app.post('/qa/questions/:question_id/answers', async (req, res) => {
   res.status(201).send('Successfully posted question to server..');
 });
 
-app.put('/questions/:question_id/helpful', (req, res) => {
+app.put('/qa/questions/:question_id/helpful', (req, res) => {
   markQuestion('helpful', req.query.question_id);
   res.status(204).send('Successfully marked question as helpful');
 });
 
-app.put('/questions/:question_id/report', (req, res) => {
+app.put('/qa/questions/:question_id/report', (req, res) => {
   markQuestion('report', req.query.question_id);
   res.status(204).send('Successfully reported question');
 });
 
-app.put('/answers/:answer_id/helpful', (req, res) => {
+app.put('/qa/answers/:answer_id/helpful', (req, res) => {
   markAnswer('helpful', req.query.answer_id);
   res.status(204).send('Successfully marked answer as helpful');
 });
 
-app.put('/answers/:answer_id/report', (req, res) => {
+app.put('/qa/answers/:answer_id/report', (req, res) => {
   markAnswer('report', req.query.answer_id);
   res.status(204).send('Successfully reported answer');
 });
