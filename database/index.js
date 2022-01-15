@@ -129,6 +129,23 @@ async function markQuestion(type, question_id, cb) {
   }
 }
 
+async function markAnswer(type, answer_id, cb) {
+  try {
+    console.log('type:', type);
+    console.log('answer_id:', answer_id);
+    if (type === 'helpful') {
+      const query = `UPDATE answers SET helpful=helpful+1 WHERE id=${answer_id}`;
+      await pool.query(query);
+    }
+    if (type === 'report') {
+      const query = `UPDATE answers SET reported=reported+1 WHERE id=${answer_id}`;
+      await pool.query(query);
+    }
+  } catch (err) {
+    cb(err);
+  }
+}
+
 module.exports = {
   pool,
   getQuestions,
@@ -136,4 +153,5 @@ module.exports = {
   postQuestion,
   postAnswer,
   markQuestion,
+  markAnswer,
 };

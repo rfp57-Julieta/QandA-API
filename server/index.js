@@ -6,6 +6,7 @@ const {
   postQuestion,
   postAnswer,
   markQuestion,
+  markAnswer,
 } = require('../database/index.js');
 
 const app = express();
@@ -97,4 +98,14 @@ app.put('/questions/:question_id/helpful', (req, res) => {
 app.put('/questions/:question_id/report', (req, res) => {
   markQuestion('report', req.query.question_id);
   res.status(204).send('Successfully reported question');
+});
+
+app.put('/answers/:answer_id/helpful', (req, res) => {
+  markAnswer('helpful', req.query.answer_id);
+  res.status(204).send('Successfully marked answer as helpful');
+});
+
+app.put('/answers/:answer_id/report', (req, res) => {
+  markAnswer('report', req.query.answer_id);
+  res.status(204).send('Successfully reported answer');
 });
