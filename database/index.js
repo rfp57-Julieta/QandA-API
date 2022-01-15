@@ -120,6 +120,10 @@ async function markQuestion(type, question_id, cb) {
       const query = `UPDATE questions SET helpful=helpful+1 WHERE id=${question_id}`;
       await pool.query(query);
     }
+    if (type === 'report') {
+      const query = `UPDATE questions SET reported=reported+1 WHERE id=${question_id}`;
+      await pool.query(query);
+    }
   } catch (err) {
     cb(err);
   }

@@ -93,3 +93,8 @@ app.put('/questions/:question_id/helpful', (req, res) => {
   markQuestion('helpful', req.query.question_id);
   res.status(204).send('put request..');
 });
+
+app.put('/questions/:question_id/report', (req, res) => {
+  markQuestion('report', req.query.question_id);
+  res.status(204).send('put request..');
+});
