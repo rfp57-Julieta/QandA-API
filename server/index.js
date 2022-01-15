@@ -1,6 +1,11 @@
 const express = require('express');
-const { ClientBase } = require('pg');
-const { pool, getQuestions } = require('../database/index.js');
+const {
+  pool,
+  getQuestions,
+  getAnswers,
+  postQuestion,
+  postAnswer,
+} = require('../database/index.js');
 
 const app = express();
 const PORT = 3000;
@@ -15,23 +20,70 @@ app.get('/', (req, res) => {
 });
 
 app.get('/qa/questions', async (req, res) => {
-  let questions = await getQuestions(req.query.product_id);
+  let questions = await getQuestions(req.query.product_id, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    }
+  });
   res.status(200).send(questions);
 });
 
-// app.get('/answers', (req, res) => {
-//   console.log('Client is trying to get answers data...');
-//   const query = `SELECT * FROM answers LIMIT 3`;
-//   client.query(query, (err, data) => {
-//     if (err) {
-//       res.status(400).send(err);
-//       console.log(
-//         'Error sending back answers data from server to client:',
-//         err
-//       );
-//     } else {
-//       res.status(200).send(data.rows);
-//       console.log('Success sending back answers data from server to client:');
-//     }
-//   });
-// });
+app.get('/qa/questions/:question_id/answers', async (req, res) => {
+  // req.params and req.query depends on what the client(FEC) sends us
+  // console.log('req.params:', req.params);
+  // console.log('req.query:', req.query);
+  let answers = await getAnswers(req.query.question_id, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    }
+  });
+  res.status(200).send(answers);
+});
+
+app.post('/qa/questions', async (req, res) => {
+  console.log('req.query:', req.query);
+  await postQuestion(
+    req.query.body,
+    req.query.name,
+    req.query.email,
+    req.query.product_id,
+    (err) => {
+      if (err) {
+        res.status(400).send(err);
+      }
+    }
+  );
+  res.status(201).send('Successfully posted question to server..');
+});
+
+app.post('/qa/questions/:question_id/answers', async (req, res) => {
+  console.log('req.query:', req.query);
+  let photos = [];
+  let parsePhotos = req.query.photos.substring(1, req.query.photos.length - 1);
+  console.log('parsePhotos:', parsePhotos);
+  if (parsePhotos === '[]') {
+    console.log('No photos');
+  }
+  if (parsePhotos.indexOf(',') < 0 && parsePhotos !== '[]') {
+    console.log('Only one photo exists');
+    photos.push(parsePhotos);
+  }
+  if (parsePhotos.indexOf(',') >= 0) {
+    console.log('More than one photo exists');
+    photos = parsePhotos.split(',');
+  }
+  // console.log('photos:', photos);
+  await postAnswer(
+    req.query.body,
+    req.query.name,
+    req.query.email,
+    req.query.question_id,
+    photos,
+    (err) => {
+      if (err) {
+        res.status(400).send(err);
+      }
+    }
+  );
+  res.status(201).send('Successfully posted question to server..');
+});
