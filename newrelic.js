@@ -1,6 +1,6 @@
 'use strict';
 // import { key } from './config.js';
-const { key } = require('./config.js');
+const { key } = require('./newrelic.config.js');
 /**
  * New Relic agent configuration.
  *
