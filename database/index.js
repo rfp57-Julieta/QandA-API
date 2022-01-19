@@ -66,7 +66,7 @@ async function getQuestions(product_id, cb) {
       product_id: product_id,
     };
     let results = [];
-    const query = `SELECT id, body, TO_TIMESTAMP(date_written/1000), asker_name, helpful, reported FROM questions WHERE product_id=${product_id} LIMIT 3`;
+    const query = `SELECT id, body, TO_TIMESTAMP(date_written/1000), asker_name, helpful, reported FROM questions WHERE product_id=${product_id}`;
     let questions_data = await pool.query(query);
     for (let question of questions_data.rows) {
       let reported = false;
@@ -82,12 +82,12 @@ async function getQuestions(product_id, cb) {
         reported: reported,
       };
       const question_id = question.id;
-      const query = `SELECT * FROM answers WHERE question_id=${question_id} LIMIT 3`;
+      const query = `SELECT * FROM answers WHERE question_id=${question_id}`;
       let answers = {};
       let answers_data = await pool.query(query);
       for (let answer of answers_data.rows) {
         const answer_id = answer.id;
-        const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id} LIMIT 3`;
+        const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id}`;
         const photos_data = await pool.query(query);
         let photos_urls = [];
         for (let photo of photos_data.rows) {
@@ -120,7 +120,7 @@ async function getAnswers(question_id, cb) {
       count: 5,
     };
     let results = [];
-    const query = `SELECT id,body,TO_TIMESTAMP(date_written/1000),answerer_name,helpful FROM answers WHERE question_id=${question_id} LIMIT 3`;
+    const query = `SELECT id,body,TO_TIMESTAMP(date_written/1000),answerer_name,helpful FROM answers WHERE question_id=${question_id}`;
     const answers_data = await pool.query(query);
     for (let answer of answers_data.rows) {
       answer1 = {
@@ -132,7 +132,7 @@ async function getAnswers(question_id, cb) {
       };
       let photos_urls = [];
       const answer_id = answer.id;
-      const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id} LIMIT 3`;
+      const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id}`;
       const photos_data = await pool.query(query);
       for (let photo of photos_data.rows) {
         let photo1 = {
