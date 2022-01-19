@@ -37,3 +37,6 @@
 -- CREATE INDEX product_id_idx ON questions(product_id);
 -- CREATE INDEX question_id_idx ON answers(question_id);
 -- CREATE INDEX answers_photos_idx ON answers_photos(answer_id);
+-- Before adding index:
+-- getQuestion average query time: 2.5 seconds
+-- getAnswer average query time: 900 ms

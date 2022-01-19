@@ -12,6 +12,7 @@
   "dependencies": {
     "csv-parse": "^5.0.4",
     "express": "^4.17.2",
+    "newrelic": "^8.7.0",
     "nodemon": "^2.0.15",
     "pg": "^8.7.1"
   }

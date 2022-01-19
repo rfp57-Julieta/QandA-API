@@ -19,13 +19,68 @@ pool
 
 async function getQuestions(product_id, cb) {
   try {
+    // console.log('hey');
+    // let package = {
+    //   product_id: product_id,
+    // };
+
+    // const agg_query = `
+    //   SELECT json_build_object(
+    //     'product_id', ${product_id},
+    //     'results', (SELECT json_agg(json_build_object(
+    //       question_id
+    //     )) FROM (SELECT id AS question_id, body as question_body, date_written as question_date, asker_name, helpful as question_helpfulness,reported FROM questions WHERE product_id=${product_id} LIMIT 3) as questions)
+    //   )
+    // `;
+
+    // const agg_query = `
+    //   SELECT json_build_object(
+    //     'product_id', ${product_id},
+    //     'results', (SELECT json_agg(questions) FROM (SELECT id AS question_id, body as question_body, date_written as question_date, asker_name, helpful as question_helpfulness,reported FROM questions WHERE product_id=${product_id} LIMIT 3) as questions)
+    //   )
+    // `;
+
+    // const agg_query = `
+    //   SELECT json_agg(questions)
+    //   FROM (SELECT id AS question_id, body as question_body, date_written as question_date, asker_name, helpful as question_helpfulness,reported FROM questions WHERE product_id=${product_id} LIMIT 3) as questions;
+    // `;
+
+    // let agg_questions_data = await pool.query(agg_query);
+    // console.log(
+    //   'agg_questions_data.rows:',
+    //   agg_questions_data.rows[0].json_build_object
+    // );
+    // let package = agg_questions_data.rows[0].json_build_object;
+    // package['results'] = agg_questions_data.rows[0].json_agg;
+
+    // for (let question of agg_questions_data.rows[0].json_agg) {
+    //   const question_id = question.question_id;
+    //   console.log('question_id:', question_id);
+    //   const agg_query = `SELECT json_build_object('id', id) FROM (SELECT id FROM answers WHERE question_id=${question_id} LIMIT 3) as answers`;
+    //   let agg_answers_data = await pool.query(agg_query);
+    //   console.log('agg_answers_data.rows:', agg_answers_data.rows);
+    // }
+
+    // Below is original code before applying json_agg
     let package = {
       product_id: product_id,
     };
-    const query = `SELECT id, body, date_written, asker_name, reported, helpful FROM questions WHERE product_id=${product_id} LIMIT 3`;
+    let results = [];
+    const query = `SELECT id, body, TO_TIMESTAMP(date_written/1000), asker_name, helpful, reported FROM questions WHERE product_id=${product_id} LIMIT 3`;
     let questions_data = await pool.query(query);
-    package['results'] = questions_data.rows;
     for (let question of questions_data.rows) {
+      let reported = false;
+      if (question.reported > 0) {
+        reported = true;
+      }
+      let question1 = {
+        question_id: question.id,
+        question_body: question.body,
+        question_date: question.to_timestamp,
+        asker_name: question.asker_name,
+        question_helpfulness: question.helpful,
+        reported: reported,
+      };
       const question_id = question.id;
       const query = `SELECT * FROM answers WHERE question_id=${question_id} LIMIT 3`;
       let answers = {};
@@ -34,17 +89,23 @@ async function getQuestions(product_id, cb) {
         const answer_id = answer.id;
         const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id} LIMIT 3`;
         const photos_data = await pool.query(query);
+        let photos_urls = [];
+        for (let photo of photos_data.rows) {
+          photos_urls.push(photo.url);
+        }
         answers[answer_id] = {
           id: answer.id,
           body: answer.body,
           date: answer.date_written,
           answerer_name: answer.answerer_name,
           helpfulness: answer.helpful,
-          photos: photos_data.rows,
+          photos: photos_urls,
         };
-        question['answers'] = answers;
+        question1['answers'] = answers;
+        results.push(question1);
       }
     }
+    package['results'] = results;
     return package;
   } catch (err) {
     cb(err);
@@ -58,25 +119,32 @@ async function getAnswers(question_id, cb) {
       page: 0,
       count: 5,
     };
-    const query = `SELECT id,body,date_written,answerer_name,helpful FROM answers WHERE question_id=${question_id} LIMIT 3`;
+    let results = [];
+    const query = `SELECT id,body,TO_TIMESTAMP(date_written/1000),answerer_name,helpful FROM answers WHERE question_id=${question_id} LIMIT 3`;
     const answers_data = await pool.query(query);
     for (let answer of answers_data.rows) {
-      // console.log('answer:', answer);
+      answer1 = {
+        answer_id: answer.id,
+        body: answer.body,
+        date: answer.to_timestamp,
+        answerer_name: answer.answerer_name,
+        helpfulness: answer.helpful,
+      };
+      let photos_urls = [];
       const answer_id = answer.id;
       const query = `SELECT * FROM answers_photos WHERE answer_id=${answer_id} LIMIT 3`;
       const photos_data = await pool.query(query);
-      // Reformatting answer object with new property names to match FEC data
-      // answer = {
-      //   answer_id: answer.id,
-      //   body: answer.body,
-      //   date: answer.date_written,
-      //   answerer_name: answer.answerer_name,
-      //   helpfulness: answer.helpful,
-      //   photos: photos_data.rows,
-      // };
-      answer['photos'] = photos_data.rows;
+      for (let photo of photos_data.rows) {
+        let photo1 = {
+          id: photo.id,
+          url: photo.url,
+        };
+        photos_urls.push(photo1);
+      }
+      answer1['photos'] = photos_urls;
+      results.push(answer1);
     }
-    package['results'] = answers_data.rows;
+    package['results'] = results;
     return package;
   } catch (err) {
     cb(err);
