@@ -1,9 +1,16 @@
+.gitignore
+
 package-lock.json
 node_modules
 .DS_Store
+
 answers.csv
 answers_photos.csv
 questions.csv
 products.csv
+
 newrelic.config.js
 newrelic_agent.log
+
+qanda.dump
+sdcproject.pem
