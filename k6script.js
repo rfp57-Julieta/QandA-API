@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { sleep, check } from 'k6';
 
 export let options = {
-  vus: 100, //stimulate how many virtual users
+  vus: 1000, //stimulate how many virtual users
   duration: '15s', //how long you want it to run
 };
 
@@ -15,7 +15,7 @@ const answersURL = `http://localhost:3000/qa/questions/:question_id/answers?ques
 }`;
 
 export default function () {
-  const res = http.get(answersURL);
+  const res = http.get(questionsURL);
   sleep(1);
   check(res, {
     'transaction time < 200ms': (r) => r.timings.duration < 200,
