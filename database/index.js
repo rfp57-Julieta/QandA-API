@@ -82,7 +82,7 @@ async function getQuestions(product_id, cb) {
         reported: reported,
       };
       const question_id = question.id;
-      const query = `SELECT * FROM answers WHERE question_id=${question_id}`;
+      const query = `SELECT id,body,TO_TIMESTAMP(date_written/1000),answerer_name,helpful FROM answers WHERE question_id=${question_id}`;
       let answers = {};
       let answers_data = await pool.query(query);
       for (let answer of answers_data.rows) {
@@ -96,7 +96,7 @@ async function getQuestions(product_id, cb) {
         answers[answer_id] = {
           id: answer.id,
           body: answer.body,
-          date: answer.date_written,
+          date: answer.to_timestamp,
           answerer_name: answer.answerer_name,
           helpfulness: answer.helpful,
           photos: photos_urls,
@@ -153,7 +153,8 @@ async function getAnswers(question_id, cb) {
 
 async function postQuestion(body, name, email, product_id, cb) {
   try {
-    const query = `INSERT INTO questions(id,product_id,body,date_written,asker_name,asker_email,reported,helpful) VALUES ((SELECT id+1 FROM questions ORDER BY id DESC LIMIT 1),${product_id},'${body}',123821,'${name}','${email}',0,0)`;
+    let currentDate = new Date() * 1000;
+    const query = `INSERT INTO questions(id,product_id,body,date_written,asker_name,asker_email,reported,helpful) VALUES ((SELECT id+1 FROM questions ORDER BY id DESC LIMIT 1),${product_id},'${body}',${currentDate},'${name}','${email}',0,0)`;
     await pool.query(query);
   } catch (err) {
     cb(err);
@@ -167,7 +168,8 @@ async function postAnswer(body, name, email, question_id, photos, cb) {
     let newIdObj = await pool.query(getNewId);
     let newId = newIdObj.rows[0]['?column?'];
     console.log('newId:', newId);
-    const query = `INSERT INTO answers(id,question_id,body,date_written,answerer_name,answerer_email,reported,helpful) VALUES (${newId},${question_id},'${body}',123821,'${name}','${email}',0,0)`;
+    let currentDate = new Date() * 1000;
+    const query = `INSERT INTO answers(id,question_id,body,date_written,answerer_name,answerer_email,reported,helpful) VALUES (${newId},${question_id},'${body}',${currentDate},'${name}','${email}',0,0)`;
     await pool.query(query);
     for (let photo of photos) {
       console.log('photo in loop:', photo);
